@@ -2316,7 +2316,6 @@ bool AudioFlinger::PlaybackThread::threadLoop()
                 }
                 releaseWakeLock_l();
                 mWakeLockUids.clear();
-                mActiveTracksGeneration++;
                 ALOGV("wait async completion");
                 mWaitWorkCV.wait(mLock);
                 ALOGV("async completion/wake");
