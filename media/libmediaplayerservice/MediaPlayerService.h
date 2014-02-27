@@ -92,7 +92,6 @@ class MediaPlayerService : public BnMediaPlayerService
         virtual status_t        getPosition(uint32_t *position) const;
         virtual status_t        getFramesWritten(uint32_t *frameswritten) const;
         virtual int             getSessionId() const;
-        virtual uint32_t        getSampleRate() const;
 
         virtual status_t        open(
                 uint32_t sampleRate, int channelCount, audio_channel_mask_t channelMask,
@@ -208,7 +207,6 @@ class MediaPlayerService : public BnMediaPlayerService
         virtual status_t        getPosition(uint32_t *position) const;
         virtual status_t        getFramesWritten(uint32_t *frameswritten) const;
         virtual int             getSessionId() const;
-        virtual uint32_t        getSampleRate() const;
 
         virtual status_t        open(
                 uint32_t sampleRate, int channelCount, audio_channel_mask_t channelMask,

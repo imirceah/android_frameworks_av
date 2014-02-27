@@ -1290,8 +1290,10 @@ sp<AudioFlinger::PlaybackThread::Track> AudioFlinger::PlaybackThread::createTrac
             // mono or stereo
             ( (channelMask == AUDIO_CHANNEL_OUT_MONO) ||
               (channelMask == AUDIO_CHANNEL_OUT_STEREO) ) &&
+#ifndef FAST_TRACKS_AT_NON_NATIVE_SAMPLE_RATE
             // hardware sample rate
             (sampleRate == mSampleRate) &&
+#endif
             // normal mixer has an associated fast mixer
             hasFastMixer() &&
             // there are sufficient fast track slots available
@@ -3109,6 +3111,7 @@ AudioFlinger::PlaybackThread::mixer_state AudioFlinger::MixerThread::prepareTrac
                     VolumeProvider *vp = track;
                     fastTrack->mBufferProvider = eabp;
                     fastTrack->mVolumeProvider = vp;
+                    fastTrack->mSampleRate = track->mSampleRate;
                     fastTrack->mChannelMask = track->mChannelMask;
                     fastTrack->mGeneration++;
                     state->mTrackMask |= 1 << j;
@@ -3176,8 +3179,15 @@ AudioFlinger::PlaybackThread::mixer_state AudioFlinger::MixerThread::prepareTrac
                 (mMixerStatusIgnoringFastTracks == MIXER_TRACKS_READY)) {
             minFrames = desiredFrames;
         }
-
-        size_t framesReady = track->framesReady();
+        // It's not safe to call framesReady() for a static buffer track, so assume it's ready
+        size_t framesReady;
+        if (track->sharedBuffer() == 0) {
+            framesReady = track->framesReady();
+        } else if (track->isStopped()) {
+            framesReady = 0;
+        } else {
+            framesReady = 1;
+        }
         if ((framesReady >= minFrames) && track->isReady() &&
                 !track->isPaused() && !track->isTerminated())
         {
